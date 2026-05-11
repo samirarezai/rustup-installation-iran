@@ -2,7 +2,7 @@
 
 This guide is written for situations where **normal access to Rust’s official infrastructure is unreliable or blocked** (for example, during severe filtering or international connectivity issues). The flow below uses a **public mirror** for `rustup` metadata and toolchain downloads, and documents a **manual rescue step** when even the mirror hostname fails to resolve until you seed one small file.
 
-The examples use **PowerShell** on **64-bit Windows** with the **MSVC** host triple (`x86_64-pc-windows-msvc`). You can adapt URLs and triples if you use a different architecture or the GNU toolchain.
+The examples use **PowerShell** on **64-bit Windows**, starting from the **MSVC** installer triple (`x86_64-pc-windows-msvc`). **Step 6** shows how to set **GNU** (`x86_64-pc-windows-gnu`) as the default toolchain afterward. You can adapt URLs and triples if you use a different architecture.
 
 ---
 
@@ -134,6 +134,68 @@ You can also verify:
 rustc --version
 rustup --version
 ```
+
+---
+
+## Step 6 — Optional: switch the default toolchain to GNU (`x86_64-pc-windows-gnu`)
+
+If you first installed the **MSVC** host triple (for example via `rustup-init.exe` for `x86_64-pc-windows-msvc`) but want the **GNU** toolchain as default—so you can link with **MinGW** instead of the Visual C++ build tools—set the **same mirror variables** in PowerShell, then install or refresh toolchains and set GNU as default.
+
+1. **Same session as your `rustup` commands** (or set these permanently in user environment variables):
+
+   ```powershell
+   $env:RUSTUP_DIST_SERVER = "https://mirrors.tuna.tsinghua.edu.cn/rustup"
+   $env:RUSTUP_UPDATE_ROOT = "https://mirrors.tuna.tsinghua.edu.cn/rustup/rustup"
+   ```
+
+2. **Ensure the default stable toolchain is present** (if you already have MSVC stable, this step may report that the existing install is in use):
+
+   ```powershell
+   rustup toolchain install
+   ```
+
+3. **Install GNU stable (if needed) and make it the default**:
+
+   ```powershell
+   rustup default stable-x86_64-pc-windows-gnu
+   ```
+
+   `rustup` will sync the channel from the mirror, download components (including **`rust-mingw`** for the GNU target), and set the default toolchain.
+
+Example session (paths and versions match a real run; yours may differ slightly):
+
+```text
+PS C:\Windows\system32> $env:RUSTUP_DIST_SERVER = "https://mirrors.tuna.tsinghua.edu.cn/rustup"
+>> $env:RUSTUP_UPDATE_ROOT = "https://mirrors.tuna.tsinghua.edu.cn/rustup/rustup"
+PS C:\Windows\system32>
+PS C:\Windows\system32> rustup toolchain install
+info: using existing install for stable-x86_64-pc-windows-msvc
+info: the active toolchain `stable-x86_64-pc-windows-msvc` has been installed
+info: it's active because: it's the default toolchain
+info: checking for self-update (current version: 1.29.0)
+PS C:\Windows\system32> rustup default stable-x86_64-pc-windows-gnu
+info: syncing channel updates for stable-x86_64-pc-windows-gnu
+info: latest update on 2026-04-16 for version 1.95.0 (59807616e 2026-04-14)
+info: downloading 7 components
+        cargo installed                       11.20 MiB
+       clippy installed                        4.89 MiB
+    rust-docs installed                       21.20 MiB
+   rust-mingw installed                        5.22 MiB
+     rust-std installed                       25.11 MiB
+        rustc installed                       95.74 MiB
+      rustfmt installed                        2.78 MiB                                                                 info: default toolchain set to stable-x86_64-pc-windows-gnu
+
+  stable-x86_64-pc-windows-gnu installed - rustc 1.95.0 (59807616e 2026-04-14)
+```
+
+After switching, confirm:
+
+```powershell
+rustup default
+rustc --version
+```
+
+You should see **`stable-x86_64-pc-windows-gnu`** as default and a `host: x86_64-pc-windows-gnu` line from `rustc -vV`.
 
 ---
 
