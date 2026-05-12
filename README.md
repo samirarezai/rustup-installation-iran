@@ -225,3 +225,4 @@ Using a **mirror** reduces dependence on `static.rust-lang.org` when it is slow 
 - **Mirror trust** — You are trusting the mirror operator not to tamper with artifacts. Prefer **well-known university or distro mirrors** and, when possible, verify checksums or signatures using documentation from the same mirror or the Rust project.
 - **If the mirror is unreachable too** — You will need another mirror, VPN, Tor, or an offline transfer strategy; this README only documents the **rustup + mirror + manual tmp seed** pattern.
 - **Corporate proxies** — If you use an HTTP proxy, you may also need `HTTP_PROXY` / `HTTPS_PROXY`; that is outside the scope of this short guide.
+- done
